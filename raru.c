@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <sys/types.h>
 
 char *self;
 char cwd[PATH_MAX];

@@ -1,19 +1,26 @@
 #!/bin/sh
 
-# This has serious limitations. Beware!
+GEOMETRY=800x600
 
 cleanup() {
-	kill -9 $VNCVIEWERPID
-	kill -9 $XVNCPID
+	kill -9 "$VNCVIEWERPID"
+	kill -9 "$XVNCPID"
 }
 
 trap cleanup SIGHUP SIGINT SIGTERM
 
-# Very roughly X + Y in 50,000 chance of collisions, where X is number of
-# xraru's, and Y is number of outbound TCP connections.
-DISP=$(($(date +%s) % 50000))
+# This is unlikely to collide since it is localhost only, but it is still
+# very possible and should be expected.
+# Add 1 so that we don't try :0. :0 *should* have security on it already,
+# but this also prevents a possible 1/50,000 non-working run.
+# Keep in mind that the order of operations is critical here.
+# Open to changing this to a non-timestamp randomness in the future.
+DISP=$((1 + $(date +%s) % 50000))
 
-env -i PATH=$PATH raru Xvnc -nolisten tcp -geometry 800x600 -depth 24 -nevershared -dontdisconnect -deferupdate 15 -once -interface 127.0.0.1 -localhost :$DISP &
+# Depth 24 for browsers. deferupdate set to 15ms so 60Hz is more attainable.
+# Lots of settings to make sure Xvnc doesn't accept new connections and the
+# raru's don't try to hijack eachother.
+env -i PATH="$PATH" raru Xvnc -nolisten tcp -geometry $GEOMETRY -depth 24 -nevershared -dontdisconnect -deferupdate 15 -once -interface 127.0.0.1 -localhost :$DISP &
 XVNCPID=$$
 
 sleep 0.1 # Hack to wait for Xvnc
@@ -23,6 +30,7 @@ VNCVIEWERPID=$$
 
 # RARUHOME for safety around developing and accidental copy/paste.
 # autocutsel optional if you want cut and paste through F8 menu.
-env -i PATH=$PATH DISPLAY=:$DISP raru /bin/sh -c 'RARUHOME=$(mktemp -d -t xraru); export HOME=$RARUHOME; autocutsel -fork; '$*'; rm -rf $RARUHOME'
+# shellcheck disable=SC2016
+env -i PATH="$PATH" DISPLAY=:$DISP raru /bin/sh -c 'RARUHOME=$(mktemp -d -t xraru); export HOME=$RARUHOME; autocutsel -fork; '"$*"'; rm -rf $RARUHOME'
 
 cleanup

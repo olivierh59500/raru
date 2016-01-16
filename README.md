@@ -16,19 +16,19 @@ So, `raru`. A user account doesn't need to have an `/etc/passwd` or an `/etc/sha
 
 One interesting behavior: If you `setuid()` in a folder tree of `/700/755`, you can poke around in `.`, even if you could never get there normally. `raru` will work with local paths if it has explict access to the current working directory. If it does not, it changes its directory to `/`.
 
-`raru` wraps your command and arguments. Unfortunately, it has to be setuid, so there's that. But, it sets a random UID and GID (both to the same) and runs the program. So you can't do `raru ls .`, because it just thinks `.` is `/var/empty`. So you *can* technically, but it shows nothing because the folder is presumably empty. But you can do, `raru ls $PWD`, which should fail if you're somewhere under `$HOME` and `$HOME` is set to `700`.
+`raru` effectively wraps your command and arguments. Unfortunately, it has to be setuid to work. It sets a random UID and GID (both to the same) and runs the program. `raru` will try to to stay in `.` if 'everyone' has explict access to it. It will attempt to `chdir(getcwd())`, effectively, and if that fails it will `chdir("/")`, instead. This means that if you are working out of a home folder, `raru` shouldn't be able to access any of the files. You will have to copy them, perhaps, into `/tmp`, and then run `raru` from there. If you are unsure of `raru`'s cwd behavior, run `pwd` and compare with `raru pwd`.
 
 Usage:
 
 `raru [program] <arguments>`
 
-NOTE: `raru` does pass along the whole environment. So run `raru env` to see what this is. If you don't like that, run `env -i PATH=$PATH raru`. Might be a good alias.
+NOTE: `raru` does pass along the whole environment. So run `raru env` to see what this is. If you don't like that, run `env -i PATH=$PATH raru`. You should probably set that as an alias.
 
 ### Potential use examples:
 
 `raru make; raru ./fishy-app-youve-never-ran-before`
 
-`raru bash # Whole shell as not-you.`
+`raru bash # Whole shell as a random user.`
 
 `raru curl https://fishysite`
 

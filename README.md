@@ -16,7 +16,7 @@ So, `raru`. A user account doesn't need to have an `/etc/passwd` or an `/etc/sha
 
 One interesting behavior: If you `setuid()` in a folder tree of `/700/755`, you can poke around in `.`, even if you could never get there normally. `raru` will work with local paths if it has explict access to the current working directory. If it does not, it changes its directory to `/`.
 
-`raru` wraps your command and arguments. Unfortunately, it has to be setuid, so there's that. But, it sets a random UID and GID (both to the same) and runs the program. So you can't do `raru ls .`, because it just things `.` is `/var/empty`. But you can do, `raru ls $PWD`, which should fail if you're somewhere under `$HOME` and `$HOME` is set to `700`.
+`raru` wraps your command and arguments. Unfortunately, it has to be setuid, so there's that. But, it sets a random UID and GID (both to the same) and runs the program. So you can't do `raru ls .`, because it just thinks `.` is `/var/empty`. So you *can* technically, but it shows nothing because the folder is presumably empty. But you can do, `raru ls $PWD`, which should fail if you're somewhere under `$HOME` and `$HOME` is set to `700`.
 
 Usage:
 

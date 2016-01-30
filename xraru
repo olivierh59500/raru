@@ -1,6 +1,8 @@
 #!/bin/sh
 
-GEOMETRY=800x600
+# Without a window manager, this is roughly the maximum that Chrome will
+# size to (with borders, even at that).
+GEOMETRY=1080x750
 
 cleanup() {
 	kill -9 "$VNCVIEWERPID"

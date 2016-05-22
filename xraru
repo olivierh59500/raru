@@ -1,15 +1,16 @@
 #!/bin/sh
 
-# Without a window manager, this is roughly the maximum that Chrome will
-# size to (with borders, even at that).
-GEOMETRY=1080x750
+# This is extremely arbitrary, along with most of this script.
+GEOMETRY=1340x750
 
 cleanup() {
-	kill -9 "$VNCVIEWERPID"
-	kill -9 "$XVNCPID"
+    echo "Killing VNC Viewer: $VNCVIEWERPID"
+    kill -9 "$VNCVIEWERPID"
+    echo "Killing XVNC: $XVNCPID"
+    kill -9 "$XVNCPID"
 }
 
-trap cleanup SIGHUP SIGINT SIGTERM
+trap cleanup HUP INT TERM
 
 # This is unlikely to collide since it is localhost only, but it is still
 # very possible and should be expected.
@@ -33,6 +34,6 @@ VNCVIEWERPID=$$
 # RARUHOME for safety around developing and accidental copy/paste.
 # autocutsel optional if you want cut and paste through F8 menu.
 # shellcheck disable=SC2016
-env -i PATH="$PATH" DISPLAY=:$DISP raru /bin/sh -c 'RARUHOME=$(mktemp -d -t xraru); export HOME=$RARUHOME; autocutsel -fork; '"$*"'; rm -rf $RARUHOME'
+env -i PATH="$PATH" DISPLAY=:$DISP raru /bin/sh -c 'RARUHOME=$(mktemp -d -t xraru); export HOME=$RARUHOME; autocutsel -fork; dwm & '"$*"'; fg; rm -rf $RARUHOME'
 
 cleanup

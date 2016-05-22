@@ -1,7 +1,8 @@
-DESTDIR=/usr/local/bin
+DESTDIR?=/usr/local/bin
 
 all:
-	cc raru.c -o raru
+	cc -DVERSION=\"`git describe --tags --long`\" -static raru.c -o raru
+	strip -s raru
 clean:
 	rm raru
 lint:

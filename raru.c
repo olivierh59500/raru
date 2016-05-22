@@ -4,15 +4,16 @@
 #include <limits.h>
 #include <sys/types.h>
 
-char cwd[PATH_MAX];
-unsigned short random;
-id_t id;
-int fd;
+#ifndef VERSION
+#define VERSION "Unknown version"
+#endif
 
 void usageQuit() {
-        puts("Usage: raru <program> [arguments]\n");
-        puts("Runs <program> as a random UID and GID (31337-96872).");
-        puts("Recommended: alias raru='env -i PATH=$PATH raru'\n");
+        puts("Usage: raru <program> [arguments]\n\n"
+             "Runs <program> as a random UID and GID (31337-96872).\n"
+             "Recommended: alias raru='env -i PATH=$PATH raru'\n"
+             "Version: "
+             VERSION);
         _exit(2);
 }
 
@@ -22,6 +23,12 @@ void failQuit(char *message) {
 }
 
 int main(int argc, char **argv) {
+
+        char cwd[PATH_MAX];    /* Current directory for absolute path.  */
+        id_t id;               /* UID and GID that we'll switch to.     */
+        int fd;                /* File descriptor for /dev/urandom.     */
+        unsigned short random; /* Our random offset for the UID/GIDs.   */
+
 	if (argc == 1)
 		usageQuit();
 	fd = open("/dev/urandom", O_RDONLY);
@@ -36,7 +43,7 @@ int main(int argc, char **argv) {
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		failQuit("getcwd() failed");
 
-	/* Have to check uid last.                                      */
+	/* Have to set gid before uid.                                  */
 
 	id = 31337 + random;
 	if (setgid(id) != 0 || setuid(id) != 0) {

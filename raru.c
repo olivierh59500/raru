@@ -25,7 +25,10 @@ int main(int argc, char **argv) {
 	if (argc == 1)
 		usageQuit();
 	fd = open("/dev/urandom", O_RDONLY);
-	read(fd, &random, sizeof(random));
+	if (fd == -1)
+		failQuit("Unable to open /dev/urandom");
+	if (read(fd, &random, sizeof(random)) != sizeof(random))
+		failQuit("Unable to read from /dev/urandom");
 	close(fd);
 
 	/* Don't mess with NULL pointers. This is setuid, afterall.     */

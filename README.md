@@ -113,6 +113,7 @@ experience slightly better.
 0. `xraru sxiv defconownsyou.jpg`
 0. `xraru openoffice memo.ppx`
 0. `xraru wine TA.exe`
+0. `xraru QT_X11_NO_MITSHM=1 pybitmessage`
 
 ### Dependencies
 
